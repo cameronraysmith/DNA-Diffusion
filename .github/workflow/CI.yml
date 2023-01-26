@@ -1,0 +1,45 @@
+name: Continous Integration
+
+on: [push, pull_request]
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 5
+      matrix:
+        python-version: [3.7, 3.8, 3.9]    
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Add conda to system path
+      run: |
+        echo $CONDA/bin >> $GITHUB_PATH
+    - name: Install dependencies
+      run: |
+        conda config --add channels defaults
+        conda config --add channels bioconda
+        conda config --add channels conda-forge
+        conda config --set channel_priority strict
+        conda install simba
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -e .
+    - name: Lint with flake8
+      run: |
+        conda install flake8
+    - name: Run flake8
+      uses: suo/flake8-github-action@releases/v1
+      with:
+        checkName: 'flake8_py3'
+    - name: Test with pytest
+      run: |
+        conda install pytest pytest-cov
+        pytest --cov
+    - name: Coverage report
+      run: |
+        bash <(curl -s https://codecov.io/bash)
