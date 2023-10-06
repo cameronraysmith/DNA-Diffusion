@@ -8,9 +8,9 @@ COPY . .
 
 RUN apt-get update && \
     apt-get install -y \
-    gcc \
     build-essential \
-    zlib1g-dev
+    zlib1g-dev \
+    git
 
 RUN pip install --upgrade pip && \
     pip install -e .
