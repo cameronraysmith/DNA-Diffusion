@@ -13,4 +13,6 @@ RUN apt-get update && \
     git
 
 RUN pip install --upgrade pip && \
+    # https://github.com/htseq/htseq/blob/4ea41e5bfee4d94dd5da62816130e805e31f3a87/setup.py#L82
+    pip install numpy && \
     pip install -e .
